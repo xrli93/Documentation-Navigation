@@ -34,6 +34,16 @@
 \renewcommand{\thesubfigure}{\thefigure.\arabic{subfigure}}
 \newcommand{\ttt}[1]{\texttt{#1}}
 
+%% Tikz
+\tikzstyle{decision} = [diamond, draw, 
+    text width=6.5em, text badly centered, node distance=3cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, 
+    text width=5em, text centered, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse, node distance=3cm,
+    minimum height=2em]
+    
+    
 \begin{document}
 \title{Documentation Localization \& Navigation}
 \author{Xinrui Li}
@@ -446,43 +456,55 @@ As we don't have the depth information, there can exist some problematic cases:
     \item Distant wall. Even if the way is far away, the robot may still detect it and refrain from advancing.
 \end{enumerate}
 
+\subsubsection{Infrared Sensors}
+In addition to vision, infrared sensors can provide us with useful information for wall detection. 
+
+% TODO: change the name of saliency
+\subsection{Saliency Test}
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/walldetect.png}
+  \caption{Wall}
+  \label{suptrain}
+\end{minipage}%
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/saliency.png}
+  \caption{Partially wall}
+  \label{states_sup}
+\end{minipage}
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/corridor.png}
+  \caption{Center of corridor}
+  \label{states_sup}
+\end{minipage}
+
+\end{figure}
+
+
 \subsubsection{Two-stage orientation with salience shifting}
 In order to overcome these potential shortcomings, as well as to integrate wall detection into the existing orientation method, we have conceived the following two-stage algorithm. 
 
-\begin{listing}[H]
-\caption{Two-Stage Orientation}
-\begin{minted}[frame=single,obeytabs=true,tabsize=4]{matlab}
-
-
-
-    
-\end{minted}
-\end{listing}
-
 %http://www.texample.net/tikz/examples/simple-flow-chart/
-\tikzstyle{decision} = [diamond, draw, 
-    text width=6.5em, text badly centered, node distance=3cm, inner sep=0pt]
-\tikzstyle{block} = [rectangle, draw, 
-    text width=5em, text centered, minimum height=4em]
-\tikzstyle{line} = [draw, -latex']
-\tikzstyle{cloud} = [draw, ellipse, node distance=3cm,
-    minimum height=2em]
 
+
+%TODO: to modify this!!!
 \begin{figure}
     \centering
     \caption{Two-stage orientation algorithm}
     \vskip 8pt
-\begin{tikzpicture}[node distance = 3cm, auto]
+\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [block] (init) {Wall Detection};
     \node  [block, below of=init](side) {Wall on one side};
     \node [block, left of=side, node distance=3cm] (corridor) {Center of corridor};
     \node  [block, right of=side, node distance=3cm](wall) {In front of a wall};
-    \node [block, right of=wall] (random) {Random turn};
+    \node [block, below of=wall] (random) {Random turn};
     \node [decision, below of=side, node distance = 3.5cm] (go1){Orientation};
-    \node [block, right of =go1, node distance = 3.5cm](turn) {Turn to salience};
-    \node [decision, below of=corridor, node distance = 3.5cm] (go2){Orientation};
-    \node [block, left of =go2, node distance = 3.5cm](forward) {Go forward};
+    \node [block, left of =go1, node distance = 3.5cm](turn) {Turn by saliency};
     \node [block, below of=go1, node distance = 3cm](follow) {Follow orientation};
     
     \path [line] (init) -| (wall);
@@ -490,11 +512,9 @@ In order to overcome these potential shortcomings, as well as to integrate wall 
     \path [line] (init) -- (side);
     \path [line] (side) -- (go1);
     \path [line] (wall) -- (random);
-    \path [line] (corridor) -- (go2);
+    \path [line] (corridor) -- (go1);
     \path [line] (go1) -- node {success} (follow);
     \path [line] (go1) -- node {fail} (turn);
-    \path [line] (go2) |- node {success} (follow);
-    \path [line] (go2) -- node {fail} (forward);
 \end{tikzpicture}
     \label{algo_orientation}
 \end{figure}
@@ -512,6 +532,21 @@ As the field of view of the camera is rather limited, the obstacles on the floor
 % TODO: A global navigation 
 
 % And this works!
+
+\section{Programming Skills}
+During the internship, I have also gained more experience in programming.
+
+Vision-related navigation and localization algorithms are principally written in \ttt{C++} in order to use libraries like OpenCV. I got to become familiarized with some basic features of modern \ttt{C++} (\ttt{C++11} and \ttt{C++14}):
+
+\begin{enumerate}
+\item \ttt{auto} specifier. use automatic type deduction can save a lot of typing.
+\item for loop comprehension.
+\item lambda functions.
+\item \ttt{std::map}
+\item shared and unique pointers.
+\end{enumerate}
+
+
 \newpage
 \printbibliography
 \end{document}
